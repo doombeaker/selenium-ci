@@ -1,22 +1,46 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+name: Workflows Test by Selenium
 
-# 初始化 WebDriver，这里以 Chrome 为例
-driver = webdriver.Chrome()
-print("selenium test in Python!!!")
-# # 打开网页
-# driver.get("http://127.0.0.1:8188")
+on:
+  push:
+    branches:
+      - main
 
-# # 等待按钮加载完成
-# queue_button = WebDriverWait(driver, 10).until(
-#     EC.element_to_be_clickable((By.ID, "queue-button"))
-# )
+jobs:
+  selenium-test:
+    runs-on: ubuntu-latest
 
-# # 点击按钮
-# queue_button.click()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-# 关闭浏览器
-driver.quit()
+      - name: Run Tests
+        run: | 
+          echo "hello world"
+          python test_model-graph-speedup.py
+        working-directory: ./tests
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11' # 选择 Python 版本
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium
+
+      - name: Download and install Chrome
+        run: |
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
+          sudo apt-get install -f
+          pwd
+
+      - name: Download and install ChromeDriver
+        run: |
+          wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -O chromedriver_latest
+          CHROMEDRIVER_VERSION=$(cat chromedriver_latest)
+          wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
