@@ -14,19 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
+      - name: Start Selenium container
         run: |
-          python -m pip install --upgrade pip
-          pip install selenium
+          docker run -d -p 4444:4444 --name selenium-container selenium/standalone-chrome
+
+      - name: Wait for Selenium container to start
+        run: sleep 30 # 等待 Selenium 容器启动，可以根据实际情况调整时间
 
       - name: Run Tests
-        run: | 
-          echo "hello world"
-          python ./tests/test_model-graph-speedup.py
-        working-directory: .
+        run: |
+          docker run --rm -v $PWD/tests:/usr/src/app -w /usr/src/app --network host selenium/standalone-chrome python test_model-graph-speedup.py
 
