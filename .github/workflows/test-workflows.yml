@@ -14,12 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create docker network
+        run: |
+        docker network create mynetwork
+
       - name: Start Selenium container
         run: |
-          docker run -d -p 4444:4444 --name selenium-container selenium/standalone-chrome
+          docker run --network host --rm --name selenium-container selenium/standalone-chrome:119.0-chromedriver-119.0-grid-4.15.0-20231129
 
       - name: Wait for Selenium container to start
-        run: sleep 30 # 等待 Selenium 容器启动，可以根据实际情况调整时间
+        run: sleep 30
 
       - name: Run Tests
         run: |
